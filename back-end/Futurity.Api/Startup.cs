@@ -1,21 +1,25 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Rewrite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Futurity.Persistence.Contexts;
 
 namespace Futurity.Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _environment;
 
-        public IConfiguration Configuration { get; }
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        {
+            _configuration = configuration;
+            _environment = environment;
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -27,10 +31,36 @@ namespace Futurity.Api
             });
 
             services.AddHealthChecks();
+
+            services.AddDbContext<FuturityMSSQLContext>(options =>
+            {
+                if (_environment.IsEnvironment("Test"))
+                {
+                    options.UseInMemoryDatabase("TestDatabase");
+                }
+                else
+                {
+                    options.UseSqlServer(_configuration.GetConnectionString("MainDataContext"));
+                }
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                var context = serviceScope.ServiceProvider.GetRequiredService<FuturityMSSQLContext>();
+
+                if (env.IsEnvironment("Test"))
+                {
+                    context.Database.EnsureDeleted();
+                }
+                else
+                {
+                    context.Database.Migrate();
+                }
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
