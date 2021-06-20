@@ -8,6 +8,7 @@ namespace Futurity.Application.Queries.Products
 {
     public class ListQuery : PageableModel, IRequest<List<ProductViewModel>>
     {
+        public string Filter { get; set; }
     }
 
     public class ListQueryValidator : AbstractValidator<ListQuery>

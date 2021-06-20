@@ -46,6 +46,8 @@
               w-full
             "
             placeholder="Search"
+            v-model="filterString"
+            @keyup="filterProducts"
           />
         </div>
       </div>
@@ -226,6 +228,7 @@ export default class ProductTable extends Vue {
   pageSize = 15;
   page = 1;
   products: Product[] = [];
+  filterString = "";
 
   mounted(): void {
     this.$nextTick(this.fetchProducts);
@@ -238,9 +241,14 @@ export default class ProductTable extends Vue {
     }
   }
 
+  filterProducts(event: KeyboardEvent): void {
+    this.page = 1;
+    this.fetchProducts();
+  }
+
   private fetchProducts(): void {
     fetch(
-      `http://localhost:5000/products?PageSize=${this.pageSize}&Page=${this.page}`
+      `http://localhost:5000/products?PageSize=${this.pageSize}&Page=${this.page}&Filter=${this.filterString}`
     )
       .then((data) => {
         return data.json();
