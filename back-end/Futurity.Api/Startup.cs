@@ -7,6 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Futurity.Persistence.Contexts;
+using FluentValidation.AspNetCore;
+using Futurity.Application.Queries.Products;
+using MediatR;
+using Newtonsoft.Json;
 
 namespace Futurity.Api
 {
@@ -23,7 +27,16 @@ namespace Futurity.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers().AddFluentValidation(configuration =>
+            {
+                configuration.RegisterValidatorsFromAssembly(typeof(ListQuery).Assembly);
+            }).AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+            });
+
+            services.AddMediatR(typeof(ListQuery).Assembly);
 
             services.AddSwaggerGen(c =>
             {
