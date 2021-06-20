@@ -72,6 +72,8 @@ namespace Futurity.Api
                 {
                     context.Database.Migrate();
                 }
+
+                FuturityMSSQLContextSeed.Seed(context);
             }
 
             if (env.IsDevelopment())

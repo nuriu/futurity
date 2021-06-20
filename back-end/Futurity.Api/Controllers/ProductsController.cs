@@ -10,9 +10,9 @@ namespace Futurity.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ProductController : FuturityBaseController
+    public class ProductsController : FuturityBaseController
     {
-        public ProductController(IMediator mediator) : base(mediator)
+        public ProductsController(IMediator mediator) : base(mediator)
         {
         }
 
