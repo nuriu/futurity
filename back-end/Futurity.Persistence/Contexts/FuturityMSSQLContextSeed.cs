@@ -24,8 +24,8 @@ namespace Futurity.Persistence.Contexts
             {
                 context.Products.Add(new Product
                 {
-                    ProductName = "",
-                    ProductDescription = "",
+                    ProductName = $"Product {i}",
+                    ProductDescription = $"Description of {i}",
                     UnitPrice = (float)(random.NextDouble() * 100),
                     UnitsInStock = random.Next()
                 });

@@ -27,6 +27,16 @@ namespace Futurity.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: "UI", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
+            });
+
             services.AddControllers().AddFluentValidation(configuration =>
             {
                 configuration.RegisterValidatorsFromAssembly(typeof(ListQuery).Assembly);
@@ -91,6 +101,8 @@ namespace Futurity.Api
             app.UseRewriter(rewriteOptions);
 
             app.UseRouting();
+
+            app.UseCors("UI");
 
             app.UseEndpoints(endpoints =>
             {
