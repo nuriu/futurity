@@ -21,6 +21,7 @@
                 w-full
               "
               placeholder="Product Name"
+              v-model="name"
             />
           </div>
           <div class="my-5 text-sm">
@@ -36,6 +37,7 @@
                 w-full
               "
               placeholder="Product Description"
+              v-model="description"
             />
           </div>
           <div class="my-5 text-sm">
@@ -51,6 +53,7 @@
                 w-full
               "
               placeholder="Unit Price"
+              v-model="price"
             />
           </div>
           <div class="my-5 text-sm">
@@ -66,6 +69,7 @@
                 w-full
               "
               placeholder="Units In Stock"
+              v-model="stock"
             />
           </div>
         </form>
@@ -92,8 +96,7 @@
           >
             Cancel
           </router-link>
-          <router-link
-            to="/"
+          <button
             class="
               bg-green-600
               mr-8
@@ -108,11 +111,76 @@
               rounded-full
               hover:shadow-lg hover:bg-green-700
             "
+            v-on:click="addProduct"
           >
             Add
-          </router-link>
+          </button>
         </div>
       </div>
     </div>
+
+    <div
+      v-if="error"
+      class="shadow-lg rounded-2xl bg-white dark:bg-gray-700 w-full my-8 p-8"
+    >
+      <ul>
+        <li v-for="error in errors" :key="error">
+          {{ error }}
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
+
+<script lang="ts">
+import Product from "@/models/product";
+import { Options, Vue } from "vue-class-component";
+
+@Options({})
+export default class AddProduct extends Vue {
+  name = "";
+  description = "";
+  price = 0;
+  stock = 0;
+
+  error = false;
+  errors: string[] = [];
+
+  private product!: Product;
+
+  addProduct(): void {
+    this.product = {
+      name: this.name,
+      description: this.description,
+      unitPrice: Number(this.price),
+      unitsInStock: Number(this.stock),
+      id: -1,
+    };
+
+    fetch("http://localhost:5000/products", {
+      method: "POST",
+      body: JSON.stringify(this.product),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    })
+      .then((data) => {
+        this.errors = [];
+        if (!data.ok) {
+          this.error = true;
+          return data.json();
+        } else {
+          this.error = false;
+          this.$router.push("/");
+        }
+      })
+      .then((data) => {
+        for (const error in data.errors) {
+          if (Object.prototype.hasOwnProperty.call(data.errors, error)) {
+            this.errors = this.errors.concat(data.errors[error]);
+          }
+        }
+      });
+  }
+}
+</script>

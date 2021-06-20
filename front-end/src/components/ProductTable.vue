@@ -218,8 +218,8 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import Product from "@/models/product";
+import { Options, Vue } from "vue-class-component";
 
 @Options({
   props: {},
