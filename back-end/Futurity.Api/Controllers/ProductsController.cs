@@ -5,6 +5,8 @@ using Futurity.Core.Exceptions;
 using Futurity.Application.Queries.Products;
 using System.Threading.Tasks;
 using MediatR;
+using System.Net.Mime;
+using Futurity.Application.Commands.Products;
 
 namespace Futurity.Api.Controllers
 {
@@ -22,6 +24,15 @@ namespace Futurity.Api.Controllers
         public async Task<ActionResult<List<ProductViewModel>>> List([FromQuery] ListQuery query)
         {
             return await Mediator.Send(query);
+        }
+
+        [HttpPost]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(Unit), 200)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
+        public async Task<ActionResult<Unit>> Add([FromBody] AddCommand data)
+        {
+            return await Mediator.Send(data);
         }
     }
 }
