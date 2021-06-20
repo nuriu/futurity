@@ -29,8 +29,7 @@ namespace Futurity.Application.Commands.Products
 
             RuleFor(ac => ac.UnitsInStock)
                 .Cascade(CascadeMode.Stop)
-                .NotEmpty()
-                .GreaterThan(0);
+                .GreaterThanOrEqualTo(0);
         }
     }
 }
